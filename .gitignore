@@ -1,0 +1,15 @@
+ml-1m.test.negative
+ml-1m.test.rating
+ml-1m.train.rating
+pinterest-20.test.rating
+pinterest-20.test.negative
+pinterest-20.train.rating
+*.pyc
+*.pyo
+*.pyd
+data/
+models/
+__pycache__/
+
+ncf_colab.ipynb
+inference.ipynb

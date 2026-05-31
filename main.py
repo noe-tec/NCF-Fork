@@ -62,8 +62,9 @@ parser.add_argument("--gpu",
 	help="gpu card ID")
 args = parser.parse_args()
 
-os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
-cudnn.benchmark = True
+device = torch.device("cuda:{}".format(args.gpu) if torch.cuda.is_available() else "cpu")
+if torch.cuda.is_available():
+	cudnn.benchmark = True
 
 
 ############################## PREPARE DATASET ##########################
@@ -91,7 +92,7 @@ else:
 
 model = model.NCF(user_num, item_num, args.factor_num, args.num_layers, 
 						args.dropout, config.model, GMF_model, MLP_model)
-model.cuda()
+model.to(device)
 loss_function = nn.BCEWithLogitsLoss()
 
 if config.model == 'NeuMF-pre':
@@ -109,9 +110,9 @@ for epoch in range(args.epochs):
 	train_loader.dataset.ng_sample()
 
 	for user, item, label in train_loader:
-		user = user.cuda()
-		item = item.cuda()
-		label = label.float().cuda()
+		user = user.to(device)
+		item = item.to(device)
+		label = label.float().to(device)
 
 		model.zero_grad()
 		prediction = model(user, item)
@@ -122,7 +123,7 @@ for epoch in range(args.epochs):
 		count += 1
 
 	model.eval()
-	HR, NDCG = evaluate.metrics(model, test_loader, args.top_k)
+	HR, NDCG = evaluate.metrics(model, test_loader, args.top_k, device)
 
 	elapsed_time = time.time() - start_time
 	print("The time elapse of epoch {:03d}".format(epoch) + " is: " + 
