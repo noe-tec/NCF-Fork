@@ -10,6 +10,4 @@ pinterest-20.train.rating
 data/
 models/
 __pycache__/
-
-ncf_colab.ipynb
 inference.ipynb
